@@ -1,0 +1,31 @@
+
+                     libcpluginmanager Library - version 0.0.0
+
+  What is it?
+  -----------
+
+  Framwork to load plugins and attach different manngers to these.
+
+  The Latest Version
+  ------------------
+
+  Details of the latest version can be found on the project page under
+  http://www.martijn-goedhart.nl/libcpluginmanager/.
+
+  Documentation
+  -------------
+
+  This package includes a man page for detailed usage of this utility.
+  Furthermore more information cat be found at
+  http://www.martijn-goedhart.nl/libcpluginmanager/
+
+  Installation
+  ------------
+
+  TODO
+
+  Licensing
+  ---------
+
+  This project is licensed under the GNU General Public License.
+  Please see the file called LICENSE for the full license text.

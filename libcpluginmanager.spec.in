@@ -1,0 +1,97 @@
+#
+# spec file for package @PACKAGE_NAME@
+#
+# @COPYRIGHT@
+#
+# All modifications and additions to the file contributed by third parties
+# remain the property of their copyright owners, unless otherwise agreed
+# upon. The license for this file, and modifications and additions to the
+# file, is the same license as for the pristine package itself (unless the
+# license for the pristine package is not an Open Source License, in which
+# case the license is the MIT License). An "Open Source License" is a
+# license that conforms to the Open Source Definition (Version 1.9)
+# published by the Open Source Initiative.
+
+%global _lto_cflags %{?_lto_cflags} -ffat-lto-objects
+
+%define libName @PACKAGE_NAME@
+%define srcVersion @VERSION@
+%define majorVersion @LIBRARY_OLD_INTERFACE@
+%define gcc_version 11
+
+Name:           @PROGRAM_NAME@
+Version:        @GIT_VERSION@
+Release:        0
+License:        @LICENSE_SHORT_RPM@
+Summary:        @PROGRAM_SUMMARY@
+Url:            @PACKAGE_HOMEPAGE@
+Group:          System/Libraries
+Source:         @PACKAGE_NAME@-@VERSION@.tar.xz
+BuildRequires:  gcc%{gcc_version}-c++
+BuildRequires:  fdupes
+BuildRequires:  gtest
+BuildRequires:  gmock
+BuildRequires:  gpsdata-devel
+BuildRequires:  gpxlib-devel
+BuildRoot:      %{_tmppath}/%{name}-%{srcVersion}-build
+
+%description
+@PROGRAM_DESCRIPTION@
+
+%package devel
+Summary:        Development files for @PACKAGE_NAME@
+Group:          Development/Sources
+Requires:       %{libName}-%{majorVersion} = %{version}
+Requires:       %{libName}-providergpsroute%{majorVersion} = %{version}
+Requires:       %{libName}-plugin-gpx = %{version}
+
+%description devel
+Development files for @PACKAGE_NAME@.
+@PROGRAM_DESCRIPTION@
+
+%package -n %{libName}-%{majorVersion}
+Summary:        @PROGRAM_SUMMARY@
+Group:          System/Libraries
+
+%description -n %{libName}-%{majorVersion}
+@PROGRAM_DESCRIPTION@
+
+%prep
+%setup -q -n %{libName}-%{srcVersion}
+
+%build
+export CXX=g++-%{gcc_version}
+%configure --disable-static --disable-debug --enable-release --enable-gtest
+make %{?_smp_mflags}
+
+%install
+%make_install
+
+%check
+make check %{?_smp_mflags}
+make clean
+
+%post -n %{libName}-%{majorVersion}
+/sbin/ldconfig
+
+%postun -n %{libName}-%{majorVersion}
+/sbin/ldconfig
+
+%files devel
+%defattr(-,root,root)
+%doc ChangeLog README AUTHORS
+%license LICENSE
+%{_includedir}/PluginManager.hpp
+%{_includedir}/cpluginmanager.h
+%{_includedir}/cpluginmanager
+%_libdir/%{libName}.la
+%_libdir/%{libName}.so
+%{_libdir}/pkgconfig/%{libName}.pc
+
+%files -n %{libName}-%{majorVersion}
+%defattr(-,root,root)
+%license LICENSE
+%{_libdir}/%{libName}.so.*
+%dir %{_libdir}/%{libName}
+
+%changelog

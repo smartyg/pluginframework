@@ -1,0 +1,124 @@
+#include "config.h"
+#include <features.h>
+
+#include "PluginManager.hpp"
+
+#include <string>
+#include <string_view>
+#include <functional>
+#include <filesystem>
+#include <utility>
+#include <dlfcn.h>
+#include <gpsdata/utils/Logger.hpp>
+
+#include "cpluginmanager/plugins.h"
+
+using pluginmanager::Manager;
+
+bool is_shared_library (const std::filesystem::directory_entry& e);
+
+bool is_shared_library (const std::filesystem::directory_entry& e) {
+	//DEBUG_MSG ("Check if file for extension: %s\n", e.path ().string ().c_str ());
+	//DEBUG_MSG ("extension is : %s\n", e.path ().extension ().string ().c_str ());
+	const auto& path = e.path ();
+	if (!path.has_extension ()) return false;
+	return (path.extension ().string ().compare (".so") == 0);
+}
+
+Manager& Manager::getInstance (void) {
+	static Manager instance; // Guaranteed to be destroyed.
+	// Instantiated on first use.
+	return instance;
+}
+
+Manager::~Manager (void) {
+	int dl_ret;
+	//for (const auto& [file, handle] : this->_loaded_files) {
+	for (auto it = this->_loaded_files.begin (); it != this->_loaded_files.end (); ++it) {
+		DEBUG_MSG ("Try to close module: %s\n", it->first.c_str ());
+		if ((dl_ret = dlclose (it->second)) != 0)
+			WARNING_MSG ("Failed to close module %s: %d\n", it->first.c_str (), dl_ret);
+	}
+}
+
+void Manager::addManager (const std::string_view tag, std::function<void(const char*, void*)> registar, std::function<void(const char*)> deregistar) {
+	bool already_present = false;
+	try {
+		this->_managers.at (std::string (tag));
+		already_present = true;
+	} catch (std::out_of_range& e) { (void)e; }
+
+	if (already_present) return;
+
+	this->_managers.insert (std::make_pair(tag, std::make_pair (registar, deregistar)));
+
+	for (const auto& entry : this->_registered_plugins) {
+		if (tag.compare (entry.first)) this->registerPluginToManager (entry.first, entry.second);
+	}
+}
+
+void Manager::registerPluginToManager (const std::string& tag, const PluginDetails& plugin) const {
+	try {
+		const auto& manager = this->_managers.at (tag);
+		const auto& register_function = std::get<0>(manager);
+		register_function (plugin.id, plugin.data);
+	} catch (std::out_of_range& e) { (void)e; }
+}
+
+void Manager::scanDirectory (std::string_view directory) {
+	const std::filesystem::path directory_path (directory);
+	if (!std::filesystem::is_directory (directory_path))
+		return;
+
+	DEBUG_MSG ("Checking files in directory: %s\n", directory_path.c_str ());
+	for (const auto& dir_entry : std::filesystem::directory_iterator{directory_path}) {
+		DEBUG_MSG ("Check file: %s\n", dir_entry.path ().c_str ());
+		if (is_regular_file (dir_entry) && is_shared_library (dir_entry)) {
+			const std::filesystem::path entry_abs = std::filesystem::canonical (dir_entry.path ());
+			// Check if the file is already open
+			bool already_loaded = false;
+			try {
+				this->_loaded_files.at (entry_abs.string ());
+				already_loaded = true;
+			} catch (std::out_of_range& e) { (void)e; }
+			if (!already_loaded) {
+				const std::string path_to_load = entry_abs.string ();
+				void *plugin = dlopen (path_to_load.c_str (), RTLD_NOW);
+				if (!plugin) {
+					WARNING_MSG ("Cannot load module %s: %s\n", path_to_load.c_str (), dlerror ());
+				} else {
+					DEBUG_MSG ("Loaded module: %s\n", path_to_load.c_str ());
+					this->_loaded_files.insert (std::make_pair (std::move (path_to_load), plugin));
+				}
+			}
+		}
+	}
+}
+
+//void Manager::loadFile (std::string_view directory) {
+
+bool Manager::hasPluginRegistered (const std::string_view tag, const std::string_view id) {
+	for (const auto& entry : this->_registered_plugins) {
+		if (tag.compare (entry.first) == 0 && id.compare (entry.second.id) == 0) return true;
+	}
+	return false;
+}
+
+void Manager::registerPlugin (const std::string& tag, const PluginDetails details) {
+	if (this->hasPluginRegistered (tag, details.id)) return;
+	this->_registered_plugins.push_back (std::make_pair (tag, details));
+	this->registerPluginToManager (tag, details);
+}
+
+void Manager::removePlugin (const std::string& tag, const std::string& id) {
+	for (auto it = this->_registered_plugins.cbegin (); it != this->_registered_plugins.cend (); ++it) {
+		if (tag.compare (it->first) == 0 && id.compare (it->second.id) == 0) {
+			try {
+				const auto& manager = this->_managers.at (tag);
+				const auto& deregister_function = std::get<1>(manager);
+				deregister_function (id.c_str ());
+			} catch (std::out_of_range& e) { (void)e; }
+			it = this->_registered_plugins.erase (it);
+		}
+	}
+}

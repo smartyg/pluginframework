@@ -8,8 +8,12 @@
 namespace pluginmanager {
 	inline namespace traits {
 		template<class T>
-		concept CONCEPT_RETURN ManagerTrait = requires(const T t) {
-			typename T::TAG;
+		concept CONCEPT_RETURN ManagerTrait = requires {
+			T::TAG;
+			requires std::is_same_v<const std::string_view, decltype(T::TAG)>;
+		} && requires(T t, const char* str, void* ptr) {
+			{ t.registar (str, ptr) } -> SAME_TYPE(void);
+			{ t.deregistar (str) } -> SAME_TYPE(void);
 		};
 	}
 }

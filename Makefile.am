@@ -206,13 +206,15 @@ clean-coverage-report:
 
 clean-coverage: clean-coverage-report
 	-$(LCOV) --gcov-tool $(GCOV) --zerocounters --directory $(top_builddir)
+
+clean-gcov-data: clean-coverage-report
 	@if xargs --version 2>/dev/null; then \
 		find $(top_builddir) -name "*.gcno" | xargs --no-run-if-empty rm; \
 	else \
 		find $(top_builddir) -name "*.gcno" | xargs rm; \
 	fi
 
-clean-local: clean-coverage
+clean-local: clean-gcov-data
 endif
 
 if GTEST

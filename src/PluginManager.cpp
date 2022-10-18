@@ -104,21 +104,111 @@ bool Manager::hasPluginRegistered (const std::string_view tag, const std::string
 	return false;
 }
 
-void Manager::registerPlugin (const std::string& tag, const PluginDetails details) {
-	if (this->hasPluginRegistered (tag, details.id)) return;
-	this->_registered_plugins.push_back (std::make_pair (tag, details));
-	this->registerPluginToManager (tag, details);
+const PluginDetails Manager::getPluginDetails (const std::string_view tag, const std::string_view id) {
+	for (const auto& entry : this->_registered_plugins) {
+		if (tag.compare (entry.first) == 0 && id.compare (entry.second.id) == 0) return entry.second;
+	}
+	return {};
 }
 
-void Manager::removePlugin (const std::string& tag, const std::string& id) {
+void Manager::registerPlugin (const std::string_view tag, const PluginDetails details) {
+	if (this->hasPluginRegistered (tag, details.id)) {
+		if (!Manager::isNewerVersion (this->getPluginDetails (tag, details.id), details)) return;
+		this->removePlugin (tag, details.id);
+	}
+	const std::string tag_str (tag);
+	this->_registered_plugins.push_back (std::make_pair (tag_str, details));
+	this->registerPluginToManager (tag_str, details);
+}
+void Manager::removePlugin (const std::string_view tag, const std::string& id) {
 	for (auto it = this->_registered_plugins.cbegin (); it != this->_registered_plugins.cend (); ++it) {
 		if (tag.compare (it->first) == 0 && id.compare (it->second.id) == 0) {
 			try {
-				const auto& manager = this->_managers.at (tag);
+				const auto& manager = this->_managers.at (std::string (tag));
 				const auto& deregister_function = std::get<1>(manager);
 				deregister_function (id.c_str ());
 			} catch (std::out_of_range& e) { (void)e; }
 			it = this->_registered_plugins.erase (it);
 		}
 	}
+}
+
+bool Manager::isNewerVersion (const PluginDetails& old_plugin, const PluginDetails& new_plugin) {
+	if (old_plugin.major_version < new_plugin.major_version) return true;
+	else if (old_plugin.major_version == new_plugin.major_version &&
+		old_plugin.minor_version < new_plugin.minor_version) return true;
+	else return false;
+}
+
+const std::vector<std::string> Manager::getTags (const bool& registered) const noexcept {
+	std::vector<std::string> ret;
+	const auto contains = [] (const std::vector<std::string>& vector, const std::string& string) -> bool {
+		const auto comparison = [&string] (const std::string& test) -> bool {
+			if (string.compare (test) == 0) return true;
+			else return false;
+		};
+		const auto res = std::find_if (vector.cbegin (), vector.cend (), comparison);
+		if (res == vector.cend ()) return false;
+		else return true;
+	};
+	for (const auto& entry : this->_registered_plugins) {
+		if (!contains (ret, entry.first)) {
+			if (!registered || (registered && this->_managers.contains (entry.first)))
+				ret.push_back (entry.first);
+		}
+	}
+	return ret;
+}
+
+const std::vector<std::string> Manager::getIds (const std::string_view tag) const noexcept {
+	std::vector<std::string> ret;
+	for (const auto& entry : this->_registered_plugins) {
+		if (tag.compare (entry.first) == 0)
+			ret.push_back (entry.second.id);
+	}
+	return ret;
+}
+
+bool Manager::hasManager (const std::string_view tag) const noexcept {
+	return this->_managers.contains (std::string (tag));
+}
+
+const std::string_view Manager::getName (const std::string_view tag, const std::string_view id) const {
+	for (const auto& entry : this->_registered_plugins) {
+		if (tag.compare (entry.first) == 0 && id.compare (entry.second.id) == 0)
+			return std::string_view (entry.second.name);
+	}
+	return {};
+}
+
+const std::string_view Manager::getAuthor (const std::string_view tag, const std::string_view id) const {
+	for (const auto& entry : this->_registered_plugins) {
+		if (tag.compare (entry.first) == 0 && id.compare (entry.second.id) == 0)
+			return std::string_view (entry.second.author);
+	}
+	return {};
+}
+
+const std::string_view Manager::getLicense (const std::string_view tag, const std::string_view id) const {
+	for (const auto& entry : this->_registered_plugins) {
+		if (tag.compare (entry.first) == 0 && id.compare (entry.second.id) == 0)
+			return std::string_view (entry.second.license);
+	}
+	return {};
+}
+
+uint8_t Manager::getMajorVersion (const std::string_view tag, const std::string_view id) const {
+	for (const auto& entry : this->_registered_plugins) {
+		if (tag.compare (entry.first) == 0 && id.compare (entry.second.id) == 0)
+			return entry.second.major_version;
+	}
+	return 0;
+}
+
+uint8_t Manager::getMinorVersion (const std::string_view tag, const std::string_view id) const {
+	for (const auto& entry : this->_registered_plugins) {
+		if (tag.compare (entry.first) == 0 && id.compare (entry.second.id) == 0)
+			return entry.second.minor_version;
+	}
+	return 0;
 }

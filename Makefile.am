@@ -114,8 +114,6 @@ calc_multiply_la_LDFLAGS = -module -avoid-version -shared
 calc_multiply_la_LIBADD = libcpluginmanager.la
 calc_multiply_la_SOURCES = examples/calc_plugins/plugin-calc-multiply.c
 
-
-
 #compile the print plugin set
 
 #example 1
@@ -125,30 +123,6 @@ c_calc_example_LDFLAGS = -Wl,-rpath=$(pkglibdir),--enable-new-dtags
 c_calc_example_CPPFLAGS = -Iinclude -DLOCALEDIR=\"$(localedir)\" -DPKGLIBDIR=\"./.libs/\"
 c_calc_example_SOURCES = examples/example_calc.c \
 	examples/calc_plugins/calc_manager.c
-#
-# bin_PROGRAMS += write_gpx
-# write_gpx_LDADD = libgpsfile2.la libgpsfile2-providergpsroute.la
-# write_gpx_LDFLAGS = -Wl,-rpath=$(pkglibdir),--enable-new-dtags
-# write_gpx_CPPFLAGS = -Iinclude -DLOCALEDIR=\"$(localedir)\" -DPKGLIBDIR=\"./.libs/\" @GPSDATA_CFLAGS@ @GPSDATA_UTILS_CFLAGS@
-# write_gpx_SOURCES = examples/write_gpx.cpp
-#
-# bin_PROGRAMS += read_and_write_gpx
-# read_and_write_gpx_LDADD = libgpsfile2.la libgpsfile2-providergpsroute.la
-# read_and_write_gpx_LDFLAGS = -Wl,-rpath=$(pkglibdir),--enable-new-dtags
-# read_and_write_gpx_CPPFLAGS = -Iinclude -DLOCALEDIR=\"$(localedir)\" -DPKGLIBDIR=\"./.libs/\" @GPSDATA_CFLAGS@ @GPSDATA_UTILS_CFLAGS@
-# read_and_write_gpx_SOURCES = examples/read_and_write_gpx.cpp
-#
-# bin_PROGRAMS += write_and_read_gpx
-# write_and_read_gpx_LDADD = libgpsfile2.la libgpsfile2-providergpsroute.la
-# write_and_read_gpx_LDFLAGS = -Wl,-rpath=$(pkglibdir),--enable-new-dtags
-# write_and_read_gpx_CPPFLAGS = -Iinclude -DLOCALEDIR=\"$(localedir)\" -DPKGLIBDIR=\"./.libs/\" @GPSDATA_CFLAGS@ @GPSDATA_UTILS_CFLAGS@
-# write_and_read_gpx_SOURCES = examples/write_and_read_gpx.cpp
-#
-# bin_PROGRAMS += read_write_gpx
-# read_write_gpx_LDADD = libgpsfile2.la gpx.la $(gpx_la_LIBADD)
-# read_write_gpx_LDFLAGS = -Wl,-rpath=$(pkglibdir),--enable-new-dtags
-# read_write_gpx_CPPFLAGS = -Iinclude -DLOCALEDIR=\"$(localedir)\" -DPKGLIBDIR=\"$(pkglibdir)\" @GPSDATA_CFLAGS@ @GPSDATA_UTILS_CFLAGS@
-# read_write_gpx_SOURCES = examples/read_write_gpx.cpp
 endif
 
 EXTRA_DIST = VERSION ChangeLog README AUTHORS LICENSE @PROGRAM_NAME@.spec
@@ -207,7 +181,14 @@ clean-coverage-report:
 clean-coverage: clean-coverage-report
 	-$(LCOV) --gcov-tool $(GCOV) --zerocounters --directory $(top_builddir)
 
-clean-gcov-data: clean-coverage-report
+clean-gcov-rundata: clean-coverage-report
+	@if xargs --version 2>/dev/null; then \
+		find $(top_builddir) -name "*.gcda" | xargs --no-run-if-empty rm; \
+	else \
+		find $(top_builddir) -name "*.gcda" | xargs rm; \
+	fi
+
+clean-gcov-data: clean-gcov-rundata clean-coverage-report
 	@if xargs --version 2>/dev/null; then \
 		find $(top_builddir) -name "*.gcno" | xargs --no-run-if-empty rm; \
 	else \

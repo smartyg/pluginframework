@@ -95,8 +95,6 @@ void Manager::scanDirectory (std::string_view directory) {
 	}
 }
 
-//void Manager::loadFile (std::string_view directory) {
-
 bool Manager::hasPluginRegistered (const std::string_view tag, const std::string_view id) {
 	for (const auto& entry : this->_registered_plugins) {
 		if (tag.compare (entry.first) == 0 && id.compare (entry.second.id) == 0) return true;

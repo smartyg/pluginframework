@@ -1,6 +1,7 @@
 #ifndef _LIBCPLUGINMANAGER_MANAGER_
 #define _LIBCPLUGINMANAGER_MANAGER_
 
+#include <memory>
 #include <string>
 #include <string_view>
 #include <map>
@@ -37,6 +38,13 @@ namespace pluginmanager {
 		~Manager (void);
 
 	public:
+		template <ManagerTrait M>
+		void addManager (const std::shared_ptr<M>& manager_instance) {
+			registar_function f1 = std::bind (&M::registar, manager_instance.get (), std::placeholders::_1, std::placeholders::_2);
+			deregistar_function f2 = std::bind (&M::deregistar, manager_instance.get (), std::placeholders::_1);
+			this->addManager (M::TAG, f1, f2);
+		}
+
 		template <ManagerTrait M>
 		void addManager (M& manager_instance) {
 			registar_function f1 = std::bind (&M::registar, manager_instance, std::placeholders::_1, std::placeholders::_2);

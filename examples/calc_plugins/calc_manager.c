@@ -11,10 +11,13 @@
 static handler_type *registered_handlers = NULL;
 static size_t registered_handlers_size = 0;
 
+void free_memory (void);
+
 void calc_register_function (const char *id, void *ptr) {
 	printf ("pointer to block is: %p; size: %ld\n", registered_handlers, registered_handlers_size);
 	handler_type* tmp = (handler_type*)realloc (registered_handlers, (registered_handlers_size + 1) * sizeof (handler_type));
 	if (tmp != NULL) {
+		if (registered_handlers == NULL) atexit (free_memory);
 		registered_handlers = tmp;
 		handler_type *entry = (handler_type*)(registered_handlers + registered_handlers_size);
 		registered_handlers_size++;
@@ -27,10 +30,11 @@ void calc_register_function (const char *id, void *ptr) {
 
 void calc_deregister_function (const char* id) {
 	// removing a entry from a malloc/realloc space is very much work, just NULLing the id pointer also works.
+	if (registered_handlers == NULL) return;
 	size_t i = 0;
 	while (i < registered_handlers_size) {
 		handler_type *entry = registered_handlers + i;
-		if (strcmp (entry->id, id) == 0) {
+		if (entry->id != NULL && strcmp (entry->id, id) == 0) {
 			entry->id = NULL; // This also makes the function unavailable.
 			return;
 		}
@@ -49,4 +53,11 @@ int calc (const char* id, int a, int b) {
 		i++;
 	}
 	return 0;
+}
+
+void free_memory (void) {
+	printf ("free_memory called; free memory at: %p\n", registered_handlers);
+	if (registered_handlers != NULL) free (registered_handlers);
+	registered_handlers = NULL;
+	registered_handlers_size = 0;
 }

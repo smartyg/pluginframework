@@ -123,6 +123,8 @@ c_calc_example_LDFLAGS = -Wl,-rpath=$(pkglibdir),--enable-new-dtags
 c_calc_example_CPPFLAGS = -Iinclude -DLOCALEDIR=\"$(localedir)\" -DPKGLIBDIR=\"./.libs/\"
 c_calc_example_SOURCES = examples/example_calc.c \
 	examples/calc_plugins/calc_manager.c
+
+noinst_HEADERS += examples/calc_plugins/calc_manager.h
 endif
 
 EXTRA_DIST = VERSION ChangeLog README AUTHORS LICENSE @PROGRAM_NAME@.spec

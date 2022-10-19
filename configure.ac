@@ -48,9 +48,9 @@ AC_DEFUN([AX_CPP_CHECK_LIB], [
 
 # some other package constants
 AX_DEFINE_SUBST([PROGRAM_NAME], [libcpluginmanager], [program name])
-AX_DEFINE_SUBST([PROGRAM_SUMMARY], [Framwork to load plugins and attach different manngers to these.], [program summary])
+AX_DEFINE_SUBST([PROGRAM_SUMMARY], [Framework to load plugin files and attach different managers to these], [program summary])
 AX_DEFINE_SUBST([PROGRAM_DESCRIPTION], [...], [program description])
-AX_DEFINE_SUBST([LAST_CHANGE], [16-10-2022], [Date of last change])
+AX_DEFINE_SUBST([LAST_CHANGE], [19-10-2022], [Date of last change])
 AX_DEFINE_SUBST([AUTHOR], [Martijn Goedhart], [Author])
 AX_DEFINE_SUBST([COPYRIGHT], [Copyright (C) 2022 Martijn Goedhart], [Copyright])
 AX_DEFINE_SUBST([LICENSE], [GNU General Public License], [License name])
@@ -80,7 +80,6 @@ AC_PROG_AWK
 AC_PROG_INSTALL
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
-AC_PROG_RANLIB
 
 # this allows us specify individual liking flags for each target
 AM_PROG_CC_C_O

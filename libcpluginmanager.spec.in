@@ -91,6 +91,5 @@ make clean
 %defattr(-,root,root)
 %license LICENSE
 %{_libdir}/%{libName}.so.*
-%dir %{_libdir}/%{libName}
 
 %changelog

@@ -1,3 +1,14 @@
+# custom entries
+/.libs
+ChangeLog
+VERSION
+config.h
+config.h.in~
+/*.tar.xz
+/*.pc
+/*.spec
+libtool
+
 # http://www.gnu.org/software/automake
 
 Makefile.in

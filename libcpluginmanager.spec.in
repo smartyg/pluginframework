@@ -27,12 +27,12 @@ Summary:        @PROGRAM_SUMMARY@
 Url:            @PACKAGE_HOMEPAGE@
 Group:          System/Libraries
 Source:         @PACKAGE_NAME@-@VERSION@.tar.xz
+BuildRequires:  gcc%{gcc_version}
 BuildRequires:  gcc%{gcc_version}-c++
 BuildRequires:  fdupes
 BuildRequires:  gtest
 BuildRequires:  gmock
 BuildRequires:  gpsdata-devel
-BuildRequires:  gpxlib-devel
 BuildRoot:      %{_tmppath}/%{name}-%{srcVersion}-build
 
 %description
@@ -41,25 +41,24 @@ BuildRoot:      %{_tmppath}/%{name}-%{srcVersion}-build
 %package devel
 Summary:        Development files for @PACKAGE_NAME@
 Group:          Development/Sources
-Requires:       %{libName}-%{majorVersion} = %{version}
-Requires:       %{libName}-providergpsroute%{majorVersion} = %{version}
-Requires:       %{libName}-plugin-gpx = %{version}
+Requires:       %{libName}%{majorVersion} = %{version}
 
 %description devel
 Development files for @PACKAGE_NAME@.
 @PROGRAM_DESCRIPTION@
 
-%package -n %{libName}-%{majorVersion}
+%package -n %{libName}%{majorVersion}
 Summary:        @PROGRAM_SUMMARY@
 Group:          System/Libraries
 
-%description -n %{libName}-%{majorVersion}
+%description -n %{libName}%{majorVersion}
 @PROGRAM_DESCRIPTION@
 
 %prep
 %setup -q -n %{libName}-%{srcVersion}
 
 %build
+export CC=gcc-%{gcc_version}
 export CXX=g++-%{gcc_version}
 %configure --disable-static --disable-debug --enable-release --enable-gtest
 make %{?_smp_mflags}
@@ -71,10 +70,10 @@ make %{?_smp_mflags}
 make check %{?_smp_mflags}
 make clean
 
-%post -n %{libName}-%{majorVersion}
+%post -n %{libName}%{majorVersion}
 /sbin/ldconfig
 
-%postun -n %{libName}-%{majorVersion}
+%postun -n %{libName}%{majorVersion}
 /sbin/ldconfig
 
 %files devel
@@ -88,7 +87,7 @@ make clean
 %_libdir/%{libName}.so
 %{_libdir}/pkgconfig/%{libName}.pc
 
-%files -n %{libName}-%{majorVersion}
+%files -n %{libName}%{majorVersion}
 %defattr(-,root,root)
 %license LICENSE
 %{_libdir}/%{libName}.so.*

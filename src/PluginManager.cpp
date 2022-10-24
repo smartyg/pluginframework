@@ -32,6 +32,21 @@ Manager& Manager::getInstance (void) {
 }
 
 Manager::~Manager (void) {
+	DEBUG_MSG ("Manager::%s ()\n", __func__);
+
+	this->_destructor_called = true;
+
+	for (const auto& entry : this->_registered_plugins) {
+		try {
+			const auto& manager = this->_managers.at (std::string (entry.first));
+			const auto& deregister_function = std::get<1>(manager);
+			deregister_function (entry.second.id);
+		} catch (std::out_of_range& e) { (void)e; }
+	}
+	this->_registered_plugins.clear ();
+
+	this->_managers.clear ();
+
 	int dl_ret;
 	//for (const auto& [file, handle] : this->_loaded_files) {
 	for (auto it = this->_loaded_files.begin (); it != this->_loaded_files.end (); ++it) {
@@ -42,6 +57,8 @@ Manager::~Manager (void) {
 }
 
 void Manager::addManager (const std::string_view tag, std::function<void(const char*, void*)> registar, std::function<void(const char*)> deregistar) {
+	DEBUG_MSG ("Manager::%s (%s, %p, %p)\n", __func__, tag.data (), registar, deregistar);
+
 	bool already_present = false;
 	try {
 		this->_managers.at (std::string (tag));
@@ -58,6 +75,8 @@ void Manager::addManager (const std::string_view tag, std::function<void(const c
 }
 
 void Manager::registerPluginToManager (const std::string& tag, const PluginDetails& plugin) const {
+	DEBUG_MSG ("Manager::%s (%s, ...)\n", __func__, tag.c_str ());
+
 	try {
 		const auto& manager = this->_managers.at (tag);
 		const auto& register_function = std::get<0>(manager);
@@ -96,6 +115,7 @@ void Manager::scanDirectory (std::string_view directory) {
 }
 
 bool Manager::hasPluginRegistered (const std::string_view tag, const std::string_view id) {
+	DEBUG_MSG ("Manager::%s (%s, %s)\n", __func__, tag.data (), tag.data ());
 	for (const auto& entry : this->_registered_plugins) {
 		if (tag.compare (entry.first) == 0 && id.compare (entry.second.id) == 0) return true;
 	}
@@ -103,6 +123,7 @@ bool Manager::hasPluginRegistered (const std::string_view tag, const std::string
 }
 
 const PluginDetails Manager::getPluginDetails (const std::string_view tag, const std::string_view id) {
+	DEBUG_MSG ("Manager::%s (%s, %s)\n", __func__, tag.data (), tag.data ());
 	for (const auto& entry : this->_registered_plugins) {
 		if (tag.compare (entry.first) == 0 && id.compare (entry.second.id) == 0) return entry.second;
 	}
@@ -110,6 +131,7 @@ const PluginDetails Manager::getPluginDetails (const std::string_view tag, const
 }
 
 void Manager::registerPlugin (const std::string_view tag, const PluginDetails details) {
+	DEBUG_MSG ("Manager::%s (%s, ...)\n", __func__, tag.data ());
 	if (this->hasPluginRegistered (tag, details.id)) {
 		if (!Manager::isNewerVersion (this->getPluginDetails (tag, details.id), details)) return;
 		this->removePlugin (tag, details.id);
@@ -119,6 +141,9 @@ void Manager::registerPlugin (const std::string_view tag, const PluginDetails de
 	this->registerPluginToManager (tag_str, details);
 }
 void Manager::removePlugin (const std::string_view tag, const std::string& id) {
+	DEBUG_MSG ("Manager::%s (%s, %s)\n", __func__, tag.data (), tag.data ());
+	if (this->_destructor_called) return;
+
 	for (auto it = this->_registered_plugins.cbegin (); it != this->_registered_plugins.cend (); ++it) {
 		if (tag.compare (it->first) == 0 && id.compare (it->second.id) == 0) {
 			try {
@@ -139,6 +164,8 @@ bool Manager::isNewerVersion (const PluginDetails& old_plugin, const PluginDetai
 }
 
 const std::vector<std::string> Manager::getTags (const bool& registered) const noexcept {
+	DEBUG_MSG ("Manager::%s (%d)\n", __func__, registered);
+
 	std::vector<std::string> ret;
 	const auto contains = [] (const std::vector<std::string>& vector, const std::string& string) -> bool {
 		const auto comparison = [&string] (const std::string& test) -> bool {
@@ -159,6 +186,7 @@ const std::vector<std::string> Manager::getTags (const bool& registered) const n
 }
 
 const std::vector<std::string> Manager::getIds (const std::string_view tag) const noexcept {
+	DEBUG_MSG ("Manager::%s (%s)\n", __func__, tag.data ());
 	std::vector<std::string> ret;
 	for (const auto& entry : this->_registered_plugins) {
 		if (tag.compare (entry.first) == 0)
@@ -168,10 +196,12 @@ const std::vector<std::string> Manager::getIds (const std::string_view tag) cons
 }
 
 bool Manager::hasManager (const std::string_view tag) const noexcept {
+	DEBUG_MSG ("Manager::%s (%s)\n", __func__, tag.data ());
 	return this->_managers.contains (std::string (tag));
 }
 
 const std::string_view Manager::getName (const std::string_view tag, const std::string_view id) const {
+	DEBUG_MSG ("Manager::%s (%s, %s)\n", __func__, tag.data (), tag.data ());
 	for (const auto& entry : this->_registered_plugins) {
 		if (tag.compare (entry.first) == 0 && id.compare (entry.second.id) == 0)
 			return std::string_view (entry.second.name);
@@ -180,6 +210,7 @@ const std::string_view Manager::getName (const std::string_view tag, const std::
 }
 
 const std::string_view Manager::getAuthor (const std::string_view tag, const std::string_view id) const {
+	DEBUG_MSG ("Manager::%s (%s, %s)\n", __func__, tag.data (), tag.data ());
 	for (const auto& entry : this->_registered_plugins) {
 		if (tag.compare (entry.first) == 0 && id.compare (entry.second.id) == 0)
 			return std::string_view (entry.second.author);
@@ -188,6 +219,7 @@ const std::string_view Manager::getAuthor (const std::string_view tag, const std
 }
 
 const std::string_view Manager::getLicense (const std::string_view tag, const std::string_view id) const {
+	DEBUG_MSG ("Manager::%s (%s, %s)\n", __func__, tag.data (), tag.data ());
 	for (const auto& entry : this->_registered_plugins) {
 		if (tag.compare (entry.first) == 0 && id.compare (entry.second.id) == 0)
 			return std::string_view (entry.second.license);
@@ -196,6 +228,7 @@ const std::string_view Manager::getLicense (const std::string_view tag, const st
 }
 
 uint8_t Manager::getMajorVersion (const std::string_view tag, const std::string_view id) const {
+	DEBUG_MSG ("Manager::%s (%s, %s)\n", __func__, tag.data (), tag.data ());
 	for (const auto& entry : this->_registered_plugins) {
 		if (tag.compare (entry.first) == 0 && id.compare (entry.second.id) == 0)
 			return entry.second.major_version;
@@ -204,6 +237,7 @@ uint8_t Manager::getMajorVersion (const std::string_view tag, const std::string_
 }
 
 uint8_t Manager::getMinorVersion (const std::string_view tag, const std::string_view id) const {
+	DEBUG_MSG ("Manager::%s (%s, %s)\n", __func__, tag.data (), tag.data ());
 	for (const auto& entry : this->_registered_plugins) {
 		if (tag.compare (entry.first) == 0 && id.compare (entry.second.id) == 0)
 			return entry.second.minor_version;

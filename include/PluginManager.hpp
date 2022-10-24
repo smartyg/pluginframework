@@ -8,6 +8,7 @@
 #include <list>
 #include <utility>
 #include <functional>
+#include <atomic>
 
 #include <cpluginmanager/types/PluginDetails.h>
 #include <cpluginmanager/traits/Manager.hpp>
@@ -21,6 +22,7 @@ namespace pluginmanager {
 		std::map<const std::string, void*> _loaded_files;
 		std::map<const std::string, std::pair<registar_function, deregistar_function>> _managers;
 		std::list<std::pair<const std::string, PluginDetails>> _registered_plugins;
+		std::atomic<bool> _destructor_called = false;
 
 		friend void cpluginmanager_addManager (const char* tag, void (*register_function)(void*), void (*deregister_function)(const char* id));
 		friend void cpluginmanager_register_plugin (const PluginDetails details);
@@ -40,8 +42,8 @@ namespace pluginmanager {
 	public:
 		template <ManagerTrait M>
 		void addManager (const std::shared_ptr<M>& manager_instance) {
-			registar_function f1 = std::bind (&M::registar, manager_instance.get (), std::placeholders::_1, std::placeholders::_2);
-			deregistar_function f2 = std::bind (&M::deregistar, manager_instance.get (), std::placeholders::_1);
+			registar_function f1 = std::bind (&M::registar, manager_instance, std::placeholders::_1, std::placeholders::_2);
+			deregistar_function f2 = std::bind (&M::deregistar, manager_instance, std::placeholders::_1);
 			this->addManager (M::TAG, f1, f2);
 		}
 

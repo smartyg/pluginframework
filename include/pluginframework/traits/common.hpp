@@ -1,5 +1,5 @@
-#ifndef _LIBCPLUGINMANAGER_TRAIT_COMMON_
-#define _LIBCPLUGINMANAGER_TRAIT_COMMON_
+#ifndef _CPLUGINMANAGER_TRAIT_COMMON_
+#define _CPLUGINMANAGER_TRAIT_COMMON_
 
 #if __cplusplus >= 202002L
 #define SAME_TYPE(type) std::same_as<type>
@@ -13,4 +13,4 @@
 #define CONCEPT_RETURN bool
 #endif
 
-#endif /* _LIBCPLUGINMANAGER_TRAIT_COMMON_ */
+#endif /* _CPLUGINMANAGER_TRAIT_COMMON_ */

@@ -1,15 +1,15 @@
 #include "config.h"
 #include <features.h>
 #include <stdio.h>
-#include <cpluginmanager.h>
+#include <pluginframework.h>
 
 #include "calc_plugins/calc_manager.h"
 
 int main (void) {
-	cpluginmanager_addManager (CALC_PLUGIN_MANAGER_TAG, &calc_register_function, &calc_deregister_function);
+	pluginframework_add_manager (CALC_PLUGIN_MANAGER_TAG, &calc_register_function, &calc_deregister_function);
 
-	cpluginmanager_scanDirectory ("./.libs");
-	cpluginmanager_scanDirectory ("./");
+	pluginframework_scan_directory ("./.libs");
+	pluginframework_scan_directory ("./");
 
 	{
 		int result;

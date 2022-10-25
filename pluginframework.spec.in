@@ -80,9 +80,8 @@ make clean
 %defattr(-,root,root)
 %doc ChangeLog README AUTHORS
 %license LICENSE
-%{_includedir}/PluginManager.hpp
-%{_includedir}/cpluginmanager.h
-%{_includedir}/cpluginmanager
+%{_includedir}/pluginframework.h
+%{_includedir}/pluginframework
 %_libdir/%{libName}.la
 %_libdir/%{libName}.so
 %{_libdir}/pkgconfig/%{libName}.pc

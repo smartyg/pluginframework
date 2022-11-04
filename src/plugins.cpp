@@ -1,5 +1,4 @@
 #include "config.h"
-#include <features.h>
 
 #include "pluginframework/plugins.h"
 

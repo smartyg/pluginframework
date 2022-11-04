@@ -14,7 +14,8 @@
 
 %global _lto_cflags %{?_lto_cflags} -ffat-lto-objects
 
-%define libName @PACKAGE_NAME@
+%define libName lib@PACKAGE_NAME@
+%define pkgName @PACKAGE_NAME@
 %define srcVersion @VERSION@
 %define majorVersion @LIBRARY_OLD_INTERFACE@
 %define gcc_version 11
@@ -29,10 +30,12 @@ Group:          System/Libraries
 Source:         @PACKAGE_NAME@-@VERSION@.tar.xz
 BuildRequires:  gcc%{gcc_version}
 BuildRequires:  gcc%{gcc_version}-c++
+BuildRequires:  pkgconfig
 BuildRequires:  fdupes
 BuildRequires:  gtest
 BuildRequires:  gmock
 BuildRequires:  gpsdata-devel
+BuildRequires:  pkgconfig(cpplogger) >= 0.1.0
 BuildRoot:      %{_tmppath}/%{name}-%{srcVersion}-build
 
 %description
@@ -55,7 +58,7 @@ Group:          System/Libraries
 @PROGRAM_DESCRIPTION@
 
 %prep
-%setup -q -n %{libName}-%{srcVersion}
+%setup -q -n %{pkgName}-%{srcVersion}
 
 %build
 export CC=gcc-%{gcc_version}
@@ -80,17 +83,15 @@ make clean
 %defattr(-,root,root)
 %doc ChangeLog README AUTHORS
 %license LICENSE
-%{_includedir}/PluginManager.hpp
-%{_includedir}/cpluginmanager.h
-%{_includedir}/cpluginmanager
+%{_includedir}/pluginframework.h
+%{_includedir}/pluginframework
 %_libdir/%{libName}.la
 %_libdir/%{libName}.so
-%{_libdir}/pkgconfig/%{libName}.pc
+%{_libdir}/pkgconfig/%{pkgName}.pc
 
 %files -n %{libName}%{majorVersion}
 %defattr(-,root,root)
 %license LICENSE
 %{_libdir}/%{libName}.so.*
-%dir %{_libdir}/%{libName}
 
 %changelog

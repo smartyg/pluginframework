@@ -1,5 +1,5 @@
-#ifndef _LIBCPLUGINMANAGER_MANAGER_
-#define _LIBCPLUGINMANAGER_MANAGER_
+#ifndef _PLUGINFRAMEWORK_CONTROLLER_
+#define _PLUGINFRAMEWORK_CONTROLLER_
 
 #include <memory>
 #include <string>
@@ -8,40 +8,42 @@
 #include <list>
 #include <utility>
 #include <functional>
+#include <atomic>
 
-#include <cpluginmanager/types/PluginDetails.h>
-#include <cpluginmanager/traits/Manager.hpp>
+#include <pluginframework/types/PluginDetails.h>
+#include <pluginframework/traits/Manager.hpp>
 
-namespace pluginmanager {
+namespace pluginframework {
 	typedef std::function<void(const char*, void*)> registar_function;
 	typedef std::function<void(const char*)> deregistar_function;
 
-	class Manager {
+	class Controller {
 	private:
 		std::map<const std::string, void*> _loaded_files;
 		std::map<const std::string, std::pair<registar_function, deregistar_function>> _managers;
 		std::list<std::pair<const std::string, PluginDetails>> _registered_plugins;
+		std::atomic<bool> _destructor_called = false;
 
-		friend void cpluginmanager_addManager (const char* tag, void (*register_function)(void*), void (*deregister_function)(const char* id));
-		friend void cpluginmanager_register_plugin (const PluginDetails details);
-		friend void cpluginmanager_remove_plugin (const char* id);
+		friend void pluginframework_add_manager (const char* tag, void (*register_function)(void*), void (*deregister_function)(const char* id));
+		friend void pluginframework_register_plugin (const PluginDetails details);
+		friend void pluginframework_remove_plugin (const char* id);
 
-		Manager (void) {
+		Controller (void) {
 			this->scanDirectory (PKGLIBDIR);
 		}
 
-		Manager (const Manager&)            = delete;
-		Manager (Manager&&) noexcept        = delete;
-		void operator= (const Manager&)     = delete;
-		void operator= (Manager&&) noexcept = delete;
+		Controller (const Controller&)         = delete;
+		Controller (Controller&&) noexcept     = delete;
+		void operator= (const Controller&)     = delete;
+		void operator= (Controller&&) noexcept = delete;
 
-		~Manager (void);
+		~Controller (void);
 
 	public:
 		template <ManagerTrait M>
 		void addManager (const std::shared_ptr<M>& manager_instance) {
-			registar_function f1 = std::bind (&M::registar, manager_instance.get (), std::placeholders::_1, std::placeholders::_2);
-			deregistar_function f2 = std::bind (&M::deregistar, manager_instance.get (), std::placeholders::_1);
+			registar_function f1 = std::bind (&M::registar, manager_instance, std::placeholders::_1, std::placeholders::_2);
+			deregistar_function f2 = std::bind (&M::deregistar, manager_instance, std::placeholders::_1);
 			this->addManager (M::TAG, f1, f2);
 		}
 
@@ -68,7 +70,7 @@ namespace pluginmanager {
 		void registerPlugin (const std::string_view tag, const PluginDetails details);
 		void removePlugin (const std::string_view tag, const std::string& id);
 
-		[[nodiscard]] static Manager& getInstance (void);
+		[[nodiscard]] static Controller& getInstance (void);
 
 	private:
 		bool hasPluginRegistered (const std::string_view tag, const std::string_view id);
@@ -77,4 +79,4 @@ namespace pluginmanager {
 	};
 }
 
-#endif /* _LIBCPLUGINMANAGER_MANAGER_ */
+#endif /* _PLUGINFRAMEWORK_CONTROLLER_ */

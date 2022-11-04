@@ -7,6 +7,5 @@ Name: @PACKAGE_NAME@
 Description: @PROGRAM_SUMMARY@
 Version: @PACKAGE_VERSION@
 URL: @PACKAGE_HOMEPAGE@
-Libs: -L${libdir} -l@PROGRAM_NAME@
-Requires: libgpsdata-utils >= 0.0.2
+Libs: -L${libdir} -l@PACKAGE_NAME@
 Cflags: -I${includedir}

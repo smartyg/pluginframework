@@ -2,8 +2,8 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.69])
-AC_INIT([libcpluginmanager], [0.0.0], [goedhart.martijn@gmail.com])
-AC_CONFIG_SRCDIR([src/PluginManager.cpp])
+AC_INIT([pluginframework], [0.0.0], [goedhart.martijn@gmail.com])
+AC_CONFIG_SRCDIR([src/Controller.cpp])
 AC_CONFIG_HEADERS([config.h])
 AH_BOTTOM([#include <features.h>])
 
@@ -47,17 +47,17 @@ AC_DEFUN([AX_CPP_CHECK_LIB], [
 ])
 
 # some other package constants
-AX_DEFINE_SUBST([PROGRAM_NAME], [libcpluginmanager], [program name])
-AX_DEFINE_SUBST([PROGRAM_SUMMARY], [Framwork to load plugins and attach different manngers to these.], [program summary])
+AX_DEFINE_SUBST([PROGRAM_NAME], [pluginframework], [program name])
+AX_DEFINE_SUBST([PROGRAM_SUMMARY], [Framework to load plugin files and attach different managers to these], [program summary])
 AX_DEFINE_SUBST([PROGRAM_DESCRIPTION], [...], [program description])
-AX_DEFINE_SUBST([LAST_CHANGE], [16-10-2022], [Date of last change])
+AX_DEFINE_SUBST([LAST_CHANGE], [25-10-2022], [Date of last change])
 AX_DEFINE_SUBST([AUTHOR], [Martijn Goedhart], [Author])
 AX_DEFINE_SUBST([COPYRIGHT], [Copyright (C) 2022 Martijn Goedhart], [Copyright])
 AX_DEFINE_SUBST([LICENSE], [GNU General Public License], [License name])
 AX_DEFINE_SUBST([LICENSE_SHORT], [GPLv3+], [License shorthand])
 AX_DEFINE_SUBST([LICENSE_SHORT_RPM], [GPL-3.0+], [SPDX License code])
 AX_DEFINE_SUBST([LICENSE_LONG], [GNU GPL version 3 or later <http://www.gnu.org/licenses/gpl-3.0.html>], [Long license description])
-AX_DEFINE_SUBST([PACKAGE_HOMEPAGE], [http://www.martijn-goedhart.nl/libgpsfile2/], [package home page])
+AX_DEFINE_SUBST([PACKAGE_HOMEPAGE], [http://www.martijn-goedhart.nl/pluginframework/], [package home page])
 
 # If the library source code has changed at all since the last update, then increment revision (‘c:r:a’ becomes ‘c:r+1:a’).
 # If any interfaces have been added, removed, or changed since the last update, increment current, and set revision to 0.
@@ -80,7 +80,6 @@ AC_PROG_AWK
 AC_PROG_INSTALL
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
-AC_PROG_RANLIB
 
 # this allows us specify individual liking flags for each target
 AM_PROG_CC_C_O
@@ -170,7 +169,7 @@ AC_CHECK_FUNCS([atexit])
 AC_CHECK_PROGS([GIT], [git])
 
 # Checks for packages.
-PKG_CHECK_MODULES([GPSDATA_UTILS], [libgpsdata-utils])
+PKG_CHECK_MODULES([CPPLOGGER], [cpplogger >= 0.1.0])
 
 # Checks for libraries.
 AX_CHECK_LIB([dl], [dlopen], [DL])
@@ -200,9 +199,9 @@ else
 	AM_SILENT_RULES([yes])
 fi
 
-if test -f libcpluginmanager.spec.in
+if test -f pluginframework.spec.in
 then
-	AC_CONFIG_FILES([libcpluginmanager.spec])
+	AC_CONFIG_FILES([pluginframework.spec])
 	git_version=$VERSION
 	if test -n "$GIT"
 	then
@@ -229,5 +228,5 @@ AM_CONDITIONAL([GMOCK], [test x$gtest = xtrue])
 
 AM_CONDITIONAL([COVERAGE], [test x$coverage = xtrue])
 
-AC_CONFIG_FILES([Makefile libcpluginmanager.pc])
+AC_CONFIG_FILES([Makefile pluginframework.pc])
 AC_OUTPUT

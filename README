@@ -1,5 +1,5 @@
 
-                     libcpluginmanager Library - version 0.0.0
+                     PluginFramework Library - version 0.0.0
 
   What is it?
   -----------
@@ -10,14 +10,14 @@
   ------------------
 
   Details of the latest version can be found on the project page under
-  http://www.martijn-goedhart.nl/libcpluginmanager/.
+  http://www.martijn-goedhart.nl/pluginframework/.
 
   Documentation
   -------------
 
   This package includes a man page for detailed usage of this utility.
   Furthermore more information cat be found at
-  http://www.martijn-goedhart.nl/libcpluginmanager/
+  http://www.martijn-goedhart.nl/pluginframework/
 
   Installation
   ------------

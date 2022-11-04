@@ -56,10 +56,10 @@ export AM_LIBS
 ## pkg-config files are also used for architecture-independent data packages,
 ## in which case the correct install location would be $(datadir)/pkgconfig.
 pkgconfigdir = $(libdir)/pkgconfig
-pkgconfig_DATA = libcpluginmanager.pc
+pkgconfig_DATA = pluginframework.pc
 
-lib_LTLIBRARIES = libcpluginmanager.la
-libcpluginmanager_la_CPPFLAGS = -Iinclude -DLOCALEDIR=\"$(localedir)\" -DPKGLIBDIR=\"$(pkglibdir)\" @GPSDATA_UTILS_CFLAGS@
+lib_LTLIBRARIES = libpluginframework.la
+libpluginframework_la_CPPFLAGS = -Iinclude -DLOCALEDIR=\"$(localedir)\" -DPKGLIBDIR=\"$(pkglibdir)\" @CPPLOGGER_CFLAGS@
 
 ## Define the source file list for the "libexample-@EXAMPLE_API_VERSION@.la"
 ## target.  Note that @EXAMPLE_API_VERSION@ is not interpreted by Automake and
@@ -67,16 +67,16 @@ libcpluginmanager_la_CPPFLAGS = -Iinclude -DLOCALEDIR=\"$(localedir)\" -DPKGLIBD
 ## and the variable name derived from that.
 ## Note that it is not necessary to list header files
 ## which are already listed elsewhere in a _HEADERS variable assignment.
-libcpluginmanager_la_SOURCES = src/PluginManager.cpp \
-	src/cpluginmanager.cpp \
+libpluginframework_la_SOURCES = src/Controller.cpp \
+	src/pluginframework.cpp \
 	src/plugins.cpp
 
-libcpluginmanager_la_LIBADD = @DL_LIBS@ @GPSDATA_UTILS_LIBS@
+libpluginframework_la_LIBADD = @DL_LIBS@ @CPPLOGGER_LIBS@
 
 ## Instruct libtool to include ABI version information in the generated shared
 ## library file (.so).  The library ABI version is defined in configure.ac, so
 ## that all version information is kept in one place.
-libcpluginmanager_la_LDFLAGS = -version-info @LIBRARY_CURRENT_VERSION@:@LIBRARY_REVISION_VERSION@:@LIBRARY_AGE_VERSION@
+libpluginframework_la_LDFLAGS = -version-info @LIBRARY_CURRENT_VERSION@:@LIBRARY_REVISION_VERSION@:@LIBRARY_AGE_VERSION@
 
 noinst_HEADERS =
 
@@ -85,19 +85,19 @@ noinst_HEADERS =
 ## filename, in order to avoid the need to define separate file lists for each
 ## installation directory.  This only works if the directory hierarchy in the
 ## source tree matches the hierarchy at the install location, however.
-libcpluginmanager_includedir = $(includedir)
-libcpluginmanager_include_HEADERS = include/cpluginmanager.h \
-	include/PluginManager.hpp
+pluginframework_includedir = $(includedir)
+pluginframework_include_HEADERS = include/pluginframework.h
 
-libcpluginmanager_sub_includedir = $(includedir)/cpluginmanager
-libcpluginmanager_sub_include_HEADERS = include/cpluginmanager/plugins.h
+pluginframework_sub_includedir = $(includedir)/pluginframework
+pluginframework_sub_include_HEADERS = include/pluginframework/plugins.h \
+	include/pluginframework/Controller.hpp
 
-libcpluginmanager_sub_traits_includedir = $(includedir)/cpluginmanager/traits
-libcpluginmanager_sub_traits_include_HEADERS = include/cpluginmanager/traits/common.hpp \
-	include/cpluginmanager/traits/Manager.hpp
+pluginframework_sub_traits_includedir = $(includedir)/pluginframework/traits
+pluginframework_sub_traits_include_HEADERS = include/pluginframework/traits/common.hpp \
+	include/pluginframework/traits/Manager.hpp
 
-libcpluginmanager_sub_types_includedir = $(includedir)/cpluginmanager/types
-libcpluginmanager_sub_types_include_HEADERS = include/cpluginmanager/types/PluginDetails.h
+pluginframework_sub_types_includedir = $(includedir)/pluginframework/types
+pluginframework_sub_types_include_HEADERS = include/pluginframework/types/PluginDetails.h
 
 if EXAMPLE
 
@@ -105,24 +105,26 @@ if EXAMPLE
 pkglib_LTLIBRARIES = calc_add.la
 calc_add_la_CPPFLAGS = -Iinclude -DLOCALEDIR=\"$(localedir)\"
 calc_add_la_LDFLAGS = -module -avoid-version -shared
-calc_add_la_LIBADD = libcpluginmanager.la
+calc_add_la_LIBADD = libpluginframework.la
 calc_add_la_SOURCES = examples/calc_plugins/plugin-calc-add.c
 
 pkglib_LTLIBRARIES += calc_multiply.la
 calc_multiply_la_CPPFLAGS = -Iinclude -DLOCALEDIR=\"$(localedir)\"
 calc_multiply_la_LDFLAGS = -module -avoid-version -shared
-calc_multiply_la_LIBADD = libcpluginmanager.la
+calc_multiply_la_LIBADD = libpluginframework.la
 calc_multiply_la_SOURCES = examples/calc_plugins/plugin-calc-multiply.c
 
 #compile the print plugin set
 
 #example 1
 noinst_PROGRAMS = c_calc_example
-c_calc_example_LDADD = libcpluginmanager.la
+c_calc_example_LDADD = libpluginframework.la
 c_calc_example_LDFLAGS = -Wl,-rpath=$(pkglibdir),--enable-new-dtags
 c_calc_example_CPPFLAGS = -Iinclude -DLOCALEDIR=\"$(localedir)\" -DPKGLIBDIR=\"./.libs/\"
 c_calc_example_SOURCES = examples/example_calc.c \
 	examples/calc_plugins/calc_manager.c
+
+noinst_HEADERS += examples/calc_plugins/calc_manager.h
 endif
 
 EXTRA_DIST = VERSION ChangeLog README AUTHORS LICENSE @PROGRAM_NAME@.spec

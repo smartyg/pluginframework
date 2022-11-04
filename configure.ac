@@ -169,7 +169,7 @@ AC_CHECK_FUNCS([atexit])
 AC_CHECK_PROGS([GIT], [git])
 
 # Checks for packages.
-PKG_CHECK_MODULES([GPSDATA_UTILS], [libgpsdata-utils])
+PKG_CHECK_MODULES([CPPLOGGER], [cpplogger >= 0.1.0])
 
 # Checks for libraries.
 AX_CHECK_LIB([dl], [dlopen], [DL])

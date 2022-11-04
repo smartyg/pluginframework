@@ -59,7 +59,7 @@ pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = pluginframework.pc
 
 lib_LTLIBRARIES = libpluginframework.la
-libpluginframework_la_CPPFLAGS = -Iinclude -DLOCALEDIR=\"$(localedir)\" -DPKGLIBDIR=\"$(pkglibdir)\" @GPSDATA_UTILS_CFLAGS@
+libpluginframework_la_CPPFLAGS = -Iinclude -DLOCALEDIR=\"$(localedir)\" -DPKGLIBDIR=\"$(pkglibdir)\" @CPPLOGGER_CFLAGS@
 
 ## Define the source file list for the "libexample-@EXAMPLE_API_VERSION@.la"
 ## target.  Note that @EXAMPLE_API_VERSION@ is not interpreted by Automake and
@@ -71,7 +71,7 @@ libpluginframework_la_SOURCES = src/Controller.cpp \
 	src/pluginframework.cpp \
 	src/plugins.cpp
 
-libpluginframework_la_LIBADD = @DL_LIBS@ @GPSDATA_UTILS_LIBS@
+libpluginframework_la_LIBADD = @DL_LIBS@ @CPPLOGGER_LIBS@
 
 ## Instruct libtool to include ABI version information in the generated shared
 ## library file (.so).  The library ABI version is defined in configure.ac, so

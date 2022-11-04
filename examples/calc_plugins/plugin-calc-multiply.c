@@ -1,7 +1,7 @@
 #include "config.h"
 #include <features.h>
 
-#include <cpluginmanager/plugins.h>
+#include <pluginframework/plugins.h>
 
 #include "calc_manager.h"
 
@@ -24,11 +24,11 @@ void register_handler (void) {
 	details.minor_version = 1;
 	details.data = &calc_function_multiply;
 
-	cpluginmanager_register_plugin (CALC_PLUGIN_MANAGER_TAG, details);
+	pluginframework_register_plugin (CALC_PLUGIN_MANAGER_TAG, details);
 }
 
 void remove_handler (void) {
-	cpluginmanager_remove_plugin (CALC_PLUGIN_MANAGER_TAG, PLUGIN_ID);
+	pluginframework_remove_plugin (CALC_PLUGIN_MANAGER_TAG, PLUGIN_ID);
 }
 
 int calc_function_multiply (int a, int b) {

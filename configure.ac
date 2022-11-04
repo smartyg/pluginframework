@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.69])
-AC_INIT([pluginframework], [0.0.0], [goedhart.martijn@gmail.com])
+AC_INIT([pluginframework], [0.0.1], [goedhart.martijn@gmail.com])
 AC_CONFIG_SRCDIR([src/Controller.cpp])
 AC_CONFIG_HEADERS([config.h])
 AH_BOTTOM([#include <features.h>])
@@ -49,8 +49,8 @@ AC_DEFUN([AX_CPP_CHECK_LIB], [
 # some other package constants
 AX_DEFINE_SUBST([PROGRAM_NAME], [pluginframework], [program name])
 AX_DEFINE_SUBST([PROGRAM_SUMMARY], [Framework to load plugin files and attach different managers to these], [program summary])
-AX_DEFINE_SUBST([PROGRAM_DESCRIPTION], [...], [program description])
-AX_DEFINE_SUBST([LAST_CHANGE], [25-10-2022], [Date of last change])
+AX_DEFINE_SUBST([PROGRAM_DESCRIPTION], [This library provides a framework to load plugins for different plugin managers. Applications can register different type of managers and decide which directories to scan for pluign files.], [program description])
+AX_DEFINE_SUBST([LAST_CHANGE], [04-11-2022], [Date of last change])
 AX_DEFINE_SUBST([AUTHOR], [Martijn Goedhart], [Author])
 AX_DEFINE_SUBST([COPYRIGHT], [Copyright (C) 2022 Martijn Goedhart], [Copyright])
 AX_DEFINE_SUBST([LICENSE], [GNU General Public License], [License name])
@@ -152,7 +152,6 @@ AX_CXX_COMPILE_STDCXX(20, ext, mandatory)
 AC_SYS_LARGEFILE
 
 # Checks for header files.
-AC_CHECK_HEADERS([stdint.h stdlib.h string.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_CHECK_HEADER_STDBOOL

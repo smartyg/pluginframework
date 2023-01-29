@@ -34,7 +34,6 @@ BuildRequires:  pkgconfig
 BuildRequires:  fdupes
 BuildRequires:  gtest
 BuildRequires:  gmock
-BuildRequires:  gpsdata-devel
 BuildRequires:  pkgconfig(cpplogger) >= 0.1.0
 BuildRoot:      %{_tmppath}/%{name}-%{srcVersion}-build
 
